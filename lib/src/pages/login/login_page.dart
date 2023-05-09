@@ -20,14 +20,16 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     print("CALL");
     return Scaffold(
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 80,
-          ),
-          Image.asset("assets/images/logo.png"),
-          LoginForm()
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 80,
+            ),
+            Image.asset("assets/images/logo.png"),
+            LoginForm('admin', '1234')
+          ],
+        ),
       ),
     );
   }

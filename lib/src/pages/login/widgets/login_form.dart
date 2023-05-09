@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
 class LoginForm extends StatelessWidget {
-  LoginForm({super.key});
-
+  LoginForm(this.username, this.password ,{super.key} );
+String username;
+String password;
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    _usernameController.text = username;
+    _passwordController.text = password;
     return Padding(
       padding: const EdgeInsets.only(top: 20.0, left: 30, right: 30),
       child: Card(
