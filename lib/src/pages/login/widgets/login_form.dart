@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../bloc/counter/counter_bloc.dart';
 
 class LoginForm extends StatelessWidget {
   LoginForm({required this.defaultUsername, this.defaultPassword, super.key});
@@ -62,10 +65,31 @@ class LoginForm extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  OutlinedButton(onPressed: () {}, child: Icon(Icons.remove)),
-                  Text("0", style: TextStyle(fontWeight: FontWeight.bold)),
-                  OutlinedButton(onPressed: () {}, child: Icon(Icons.add)),
+                  OutlinedButton(
+                    onPressed: () =>
+                        context.read<CounterBloc>().add(CounterEventRemove()),
+                    child: Icon(Icons.remove),
+                  ),
+                  BlocBuilder<CounterBloc, CounterState>(
+                    builder: (context, state) {
+                      return Text(
+                        "${state.count1} : ${state.count2}",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      );
+                    },
+                  ),
+                  OutlinedButton(
+                    onPressed: () =>
+                        context.read<CounterBloc>().add(CounterEventAdd()),
+                    child: Icon(Icons.add),
+                  ),
                 ],
+              ),
+              // Set Button
+              TextButton(
+                onPressed: () =>
+                    context.read<CounterBloc>().add(CounterEventSet1(0)),
+                child: Text("Set1"),
               )
             ],
           ),
