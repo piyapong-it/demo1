@@ -14,24 +14,23 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   int count = 0;
 
-
-
   @override
   Widget build(BuildContext context) {
     print("CALL");
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 80,
+        body: Column(
+      children: [
+        SizedBox(height: 80),
+        Image.asset("assets/images/logo.png"),
+        Expanded(
+          child: SingleChildScrollView(
+            child: LoginForm(
+              defaultUsername: "admin",
+              defaultPassword: "1234",
             ),
-            Image.asset("assets/images/logo.png"),
-            LoginForm(defaultUsername: 'admin', defaultPassword: '1234')
-          ],
+          ),
         ),
-      ),
-    );
+      ],
+    ));
   }
-
 }

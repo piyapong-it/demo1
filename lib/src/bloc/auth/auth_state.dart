@@ -1,10 +1,26 @@
 part of 'auth_bloc.dart';
 
-abstract class AuthState extends Equatable {
-  const AuthState();
-}
+enum LoginStatus { fetching, success, failed, init }
 
-class AuthInitial extends AuthState {
+class AuthState extends Equatable {
+  final LoginStatus status;
+  final String dialogMessage;
+
+  const AuthState({
+    this.status = LoginStatus.init,
+    this.dialogMessage = "",
+  });
+
+  AuthState copyWith({
+    LoginStatus? status,
+    String? dialogMessage,
+  }) {
+    return AuthState(
+      status: status ?? this.status,
+      dialogMessage: dialogMessage ?? this.dialogMessage,
+    );
+  }
+
   @override
-  List<Object> get props => [];
+  List<Object> get props => [status, dialogMessage];
 }
