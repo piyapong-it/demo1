@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
               height: 80,
             ),
             Image.asset("assets/images/logo.png"),
-            LoginForm('admin', '1234')
+            LoginForm(defaultUsername: 'admin', defaultPassword: '1234')
           ],
         ),
       ),
