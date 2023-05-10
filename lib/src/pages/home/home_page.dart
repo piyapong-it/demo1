@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dio/dio.dart';
 
+import '../../bloc/home/home_bloc.dart';
 import '../../constants/asset.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,9 +29,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   loadData() async {
-    // final result = await dio.get("http://10.11.50.229:1150/products");
-    // products = productFromJson(jsonEncode(result.data));
-    // setState(() {});
+    context.read<HomeBloc>().add(HomeEventFetch());
   }
 
   @override
@@ -40,12 +39,20 @@ class _HomePageState extends State<HomePage> {
           title: Text("HomePage"),
         ),
         drawer: CustomDrawer(),
-        body: ListView.builder(
-          itemCount: products.length,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Text(" - " + products[index].name, style: TextStyle(fontSize: 10),),
+        body: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            final Products = state.products;
+            return ListView.builder(
+              itemCount: products.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text(
+                    " - " + products[index].name,
+                    style: TextStyle(fontSize: 10),
+                  ),
+                );
+              },
             );
           },
         ));
