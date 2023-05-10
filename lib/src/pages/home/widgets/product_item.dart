@@ -70,7 +70,7 @@ class ProductItem extends StatelessWidget {
 
   Expanded _buildInfo() => Expanded(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(5.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +82,7 @@ class ProductItem extends StatelessWidget {
                         fontSize: 14,
                         fontWeight: FontWeight.normal,
                       )
-                    : TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    : TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -94,7 +94,7 @@ class ProductItem extends StatelessWidget {
                     child: Text(
                       '฿${formatCurrency.format(product.price)}',
                       style: TextStyle(
-                        fontSize: isGrid ?? false ? 14 : 16,
+                        fontSize: isGrid ?? false ? 12 : 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -102,7 +102,7 @@ class ProductItem extends StatelessWidget {
                   Text(
                     '${formatNumber.format(product.stock)} pieces',
                     style: TextStyle(
-                      fontSize: isGrid ?? false ? 14 : 16,
+                      fontSize: isGrid ?? false ? 12 : 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.deepOrangeAccent,
                     ),
