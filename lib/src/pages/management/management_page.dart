@@ -1,21 +1,21 @@
 import 'dart:io';
 
+import 'package:demo1/src/pages/management/widgets/product_form.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../app.dart';
-import '../../constants/network_api.dart';
+import '../../bloc/management/management_bloc.dart';
 import '../../models/product.dart';
 
 class ManagementPage extends StatefulWidget {
   const ManagementPage({Key? key}) : super(key: key);
 
   @override
-  State<ManagementPage> createState() => _ManagementPageState();
+  _ManagementPageState createState() => _ManagementPageState();
 }
 
 class _ManagementPageState extends State<ManagementPage> {
   final _form = GlobalKey<FormState>();
-  final _widgetStateDemo = GlobalKey<WidgetStateDemoState>();
   var _product = Product(name: "productX", price: 10, stock: 20);
   var _editMode = false;
   File? _imageFile;
@@ -29,64 +29,35 @@ class _ManagementPageState extends State<ManagementPage> {
     }
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Management'),
-        ),
-        body: Container(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Form(
-                  key: _form,
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        decoration: const InputDecoration(labelText: "Name"),
-                        initialValue: _product.name,
-                        onSaved: (value) => _product.name = value ?? "",
-                      ),
-                      TextFormField(
-                        decoration: const InputDecoration(labelText: "price"),
-                        initialValue: formatNumber.format(_product.price),
-                         onSaved: (value) => _product.price = int.parse(value?.replaceAll(",", "") ?? "0"),
-                      ),
-                      TextFormField(
-                        decoration: const InputDecoration(labelText: "stock"),
-                        initialValue: formatNumber.format(_product.stock),
-                        onSaved: (value) => _product.stock = int.parse(value?.replaceAll(",", "") ?? "0"),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      ElevatedButton(onPressed: () {
-                        _form.currentState?.save();
-                        print("${_product.name}, ${_product.price},${_product.stock}");
-                        _widgetStateDemo.currentState?.callMe();
-                      }, child: Text("Submit")),
-                      WidgetStateDemo(key: _widgetStateDemo)
-                    ],
-                  ))
-            ],
+      appBar: AppBar(title: Text("Management"), actions: [
+        IconButton(
+            icon: Icon(Icons.upload),
+            onPressed: () => context.read<ManagementBloc>().add(ManagementEventSubmit(
+                  product: _product,
+                  image: _imageFile,
+                  isEditMode: _editMode,
+                  form: _form,
+                ))),
+      ]),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(30.0),
+          child: ProductForm(
+            _product,
+            callBackSetImage: _callBackSetImage,
+            formKey: _form,
+            deleteProduct: _editMode ? _deleteProduct : null,
           ),
-        ));
-  }
-}
-class WidgetStateDemo extends StatefulWidget {
-  const WidgetStateDemo({super.key});
-
-  @override
-  State<WidgetStateDemo> createState() => WidgetStateDemoState();
-}
-
-class WidgetStateDemoState extends State<WidgetStateDemo> {
-
-  callMe(){
-    print("CallME");
+        ),
+      ),
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Text("WidgetStateDemo");
+  void _deleteProduct() {
+    context.read<ManagementBloc>().add(ManagementEventDelete(_product.id!));
+  }
+
+  void _callBackSetImage(File? imageFile) {
+    _imageFile = imageFile;
   }
 }
