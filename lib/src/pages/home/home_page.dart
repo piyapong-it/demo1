@@ -1,83 +1,99 @@
-import 'dart:convert';
-
 import 'package:demo1/src/bloc/auth/auth_bloc.dart';
-import 'package:demo1/src/models/product.dart';
-import 'package:demo1/src/pages/app_routes.dart';
-import 'package:demo1/src/pages/home/widgets/dialog_barcode_image.dart';
-import 'package:demo1/src/pages/home/widgets/dialog_qr_image.dart';
-import 'package:demo1/src/pages/home/widgets/dialog_scan_qrcode.dart';
+import 'package:demo1/src/bloc/home/home_bloc.dart';
+import 'package:demo1/src/pages/home/widgets/product_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dio/dio.dart';
 
-import '../../bloc/home/home_bloc.dart';
 import '../../constants/asset.dart';
-import 'widgets/product_item.dart';
+import '../../models/product.dart';
+import '../app_routes.dart';
+import 'widgets/dialog_barcode_image.dart';
+import 'widgets/dialog_qr_image.dart';
+import 'widgets/dialog_scan_qrcode.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Product> products = [];
   @override
   initState() {
     super.initState();
-    loadData();
-  }
-
-  loadData() async {
     context.read<HomeBloc>().add(HomeEventFetch());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Home')),
-        drawer: CustomDrawer(),
+        appBar: AppBar(
+          title: const Text('Home'),
+          actions: [
+            IconButton(onPressed: () {
+              context.read<HomeBloc>().add(HomeEventToggleDisplay());
+            }, icon: BlocBuilder<HomeBloc, HomeState>(
+              builder: (context, state) {
+                return Icon(state.isGrid ? Icons.grid_3x3 : Icons.list);
+              },
+            )),
+          ],
+        ),
+        drawer: const CustomDrawer(),
         body: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
             final products = state.products;
-            return Container(
-              // child: state.isGrid ? _buildListView(products) : _buildListView(products),
-              child: state.isGrid
-                  ? _buildGridView(products)
-                  : _buildGridView(products),
+            return RefreshIndicator(
+              onRefresh: () async =>
+                  context.read<HomeBloc>().add(HomeEventFetch()),
+              child: state.status == FetchStatus.fetching
+                  ? _buildLoadingView()
+                  : Container(
+                      child: state.isGrid
+                          ? _buildGridView(products)
+                          : _buildListView(products),
+                    ),
             );
           },
         ));
   }
 
+  _buildLoadingView() => Container(
+      alignment: Alignment.center,
+      width: double.infinity,
+      height: double.infinity,
+      color: Colors.white,
+      child: Text("Loading ..."));
+
   Widget _buildGridView(List<Product> products) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+    return Container(
+      color: Colors.black,
       child: GridView.builder(
+        padding: const EdgeInsets.only(top: 10),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 1,
           mainAxisSpacing: 1,
-          childAspectRatio: 0.9, // set height ratio -  (itemWidth / itemHeight)
+          childAspectRatio:
+              0.75, // set height ratio -  (itemWidth / itemHeight)
         ),
         itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(left: 8, right: 8),
-            child: SizedBox(
-              height: 350,
-              child: ProductItem(
-                isGrid: true,
-                product: products[index],
-                onTap: () => {print(products[index].name)},
-                onTapPrice: () => {print(products[index])},
-              ),
-            ),
+          return ProductItem(
+            isGrid: true,
+            product: products[index],
+            onTap: () => {_navigateManagementPage(products[index])},
+            onTapPrice: () => {print(products[index].price)},
           );
         },
         itemCount: products.length,
       ),
     );
+  }
+
+  _navigateManagementPage([Product? product]) async {
+    await Navigator.pushNamed(context, AppRoute.management, arguments: product);
+    context.read<HomeBloc>().add(HomeEventFetch());
   }
 
   Widget _buildListView(List<Product> products) {
@@ -93,8 +109,8 @@ class _HomePageState extends State<HomePage> {
                   height: 350,
                   child: ProductItem(
                     product: products[index],
-                    onTap: () => {print(products[index].name)},
-                    onTapPrice: () => {print(products[index])},
+                    onTap: () => {_navigateManagementPage(products[index])},
+                    onTapPrice: () => {print(products[index].price)},
                   ),
                 ),
               ),
@@ -107,8 +123,8 @@ class _HomePageState extends State<HomePage> {
               height: 350,
               child: ProductItem(
                 product: products[index],
-                onTap: () => {print(products[index].name)},
-                onTapPrice: () => {print(products[index])},
+                onTap: () => {_navigateManagementPage(products[index])},
+                onTapPrice: () => {print(products[index].price)},
               ),
             ),
           );
@@ -132,9 +148,8 @@ class CustomDrawer extends StatelessWidget {
     showDialog<void>(
       context: context,
       barrierDismissible: true,
-      builder: (BuildContext dialogContext) => const DialogBarcodeImage(
-        'www.codemobiles.com',
-      ),
+      builder: (BuildContext dialogContext) =>
+          const DialogBarcodeImage('www.codemobiles.com'),
     );
   }
 
@@ -164,12 +179,12 @@ class CustomDrawer extends StatelessWidget {
         children: [
           _buildProfile(),
           ListTile(
-            onTap: () {},
-            leading: Icon(
+            onTap: () => print("Stock"),
+            leading: const Icon(
               Icons.add_box_rounded,
               color: Colors.deepPurple,
             ),
-            trailing: Text("120"),
+            trailing: Text("(120)"),
             title: Text("Stock"),
           ),
           ListTile(
@@ -222,9 +237,10 @@ class CustomDrawer extends StatelessWidget {
   Builder _buildLogoutButton() => Builder(
         builder: (context) => SafeArea(
           child: ListTile(
-              leading: const Icon(Icons.exit_to_app),
-              title: const Text('Log out'),
-              onTap: () => context.read<AuthBloc>().add(AuthEventLogout())),
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text('Log out'),
+            onTap: () => context.read<AuthBloc>().add(AuthEventLogout()),
+          ),
         ),
       );
 }

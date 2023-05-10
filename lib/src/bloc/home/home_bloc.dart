@@ -11,12 +11,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeState()) {
     // Fetch
     on<HomeEventFetch>((event, emit) async {
+      emit(state.copywith(status: FetchStatus.success, products: []));
       emit(state.copywith(status: FetchStatus.fetching));
+      await Future.delayed(Duration(milliseconds: 300));
       final products = await NetworkService().getProduct();
       emit(state.copywith(status: FetchStatus.success, products: products));
     });
 
-    // Toggle display mode
-    on<HomeEventToggleDisplay>((event, emit) {});
+        // Toggle display mode
+    on<HomeEventToggleDisplay>((event, emit) {
+      emit(state.copywith(isGrid: !state.isGrid));
+    });
   }
 }
