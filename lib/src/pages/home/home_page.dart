@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
     context.read<HomeBloc>().add(HomeEventFetch());
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: const Text('Home')),
@@ -42,10 +42,42 @@ class _HomePageState extends State<HomePage> {
           builder: (context, state) {
             final products = state.products;
             return Container(
-              child: state.isGrid ? _buildListView(products) : _buildListView(products),
+              // child: state.isGrid ? _buildListView(products) : _buildListView(products),
+              child: state.isGrid
+                  ? _buildGridView(products)
+                  : _buildGridView(products),
             );
           },
         ));
+  }
+
+  Widget _buildGridView(List<Product> products) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 1,
+          mainAxisSpacing: 1,
+          childAspectRatio: 0.9, // set height ratio -  (itemWidth / itemHeight)
+        ),
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 8, right: 8),
+            child: SizedBox(
+              height: 350,
+              child: ProductItem(
+                isGrid: true,
+                product: products[index],
+                onTap: () => {print(products[index].name)},
+                onTapPrice: () => {print(products[index])},
+              ),
+            ),
+          );
+        },
+        itemCount: products.length,
+      ),
+    );
   }
 
   Widget _buildListView(List<Product> products) {
@@ -54,14 +86,15 @@ class _HomePageState extends State<HomePage> {
         if (index == 0) {
           return Column(
             children: [
-               _buildHeader(),
+              _buildHeader(),
               Padding(
                 padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
                 child: SizedBox(
                   height: 350,
                   child: ProductItem(
                     product: products[index],
-                    onTap: () => {},
+                    onTap: () => {print(products[index].name)},
+                    onTapPrice: () => {print(products[index])},
                   ),
                 ),
               ),
@@ -74,7 +107,8 @@ class _HomePageState extends State<HomePage> {
               height: 350,
               child: ProductItem(
                 product: products[index],
-                onTap: () => {},
+                onTap: () => {print(products[index].name)},
+                onTapPrice: () => {print(products[index])},
               ),
             ),
           );
@@ -83,7 +117,7 @@ class _HomePageState extends State<HomePage> {
       itemCount: products.length,
     );
   }
-  
+
   _buildHeader() {
     return Image.asset(Asset.logoImage);
   }

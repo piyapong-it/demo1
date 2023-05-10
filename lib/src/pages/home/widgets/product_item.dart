@@ -9,12 +9,14 @@ class ProductItem extends StatelessWidget {
   const ProductItem({
     required this.product,
     required this.onTap,
+    required this.onTapPrice,
     this.isGrid,
     Key? key,
   }) : super(key: key);
 
   final Product product;
   final VoidCallback? onTap;
+  final VoidCallback? onTapPrice;
   final bool? isGrid;
 
   @override
@@ -80,11 +82,14 @@ class ProductItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '฿${formatCurrency.format(product.price)}',
-                    style: TextStyle(
-                      fontSize: isGrid ?? false ? 15 : 18,
-                      fontWeight: FontWeight.bold,
+                  TextButton(
+                    onPressed: onTapPrice,
+                    child: Text(
+                      '฿${formatCurrency.format(product.price)}',
+                      style: TextStyle(
+                        fontSize: isGrid ?? false ? 15 : 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   Text(
