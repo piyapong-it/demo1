@@ -180,7 +180,8 @@ class _ProductImageState extends State<ProductImage> {
             Icons.clear,
           ),
           shape: CircleBorder(
-            side: BorderSide(width: 1, color: Colors.grey, style: BorderStyle.solid),
+            side: BorderSide(
+                width: 1, color: Colors.grey, style: BorderStyle.solid),
           ),
         ),
       );

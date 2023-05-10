@@ -39,6 +39,9 @@ class ProductForm extends StatelessWidget {
               ),
             ],
           ),
+          TextButton(
+              onPressed: () => _showBottomActionSheet(context),
+              child: Text("Action")),
           ProductImage(
             callBackSetImage,
             image: product.image,
@@ -48,6 +51,24 @@ class ProductForm extends StatelessWidget {
           const SizedBox(height: 80),
         ],
       ),
+    );
+  }
+
+  _showBottomActionSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+            height: 120,
+          child: Column(
+            children: [
+              ListTile(title: Text("Menu1"), leading: Icon(Icons.add),),
+              ListTile(title: Text("Menu2"),leading: Icon(Icons.list),)
+            ],
+          )
+          ,
+        );
+      },
     );
   }
 
@@ -101,7 +122,8 @@ class ProductForm extends StatelessWidget {
         },
       );
 
-  FloatingActionButton _buildDeleteButton(BuildContext context) => FloatingActionButton(
+  FloatingActionButton _buildDeleteButton(BuildContext context) =>
+      FloatingActionButton(
         backgroundColor: Colors.redAccent,
         onPressed: () => _delete(context),
         child: Icon(Icons.delete_outlined),
