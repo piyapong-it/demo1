@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:demo1/src/bloc/auth/auth_bloc.dart';
+import 'package:demo1/src/models/product.dart';
 import 'package:demo1/src/pages/app_routes.dart';
 import 'package:demo1/src/pages/home/widgets/dialog_barcode_image.dart';
 import 'package:demo1/src/pages/home/widgets/dialog_qr_image.dart';
@@ -17,34 +20,36 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
+  List<Product> products = [];
   @override
-  void initState() {
+  initState() {
     super.initState();
-     final dio = Dio();
-     dio.get("http://10.11.50.229:1150/products").then((value) => 
-     print(value.data.toString())
-     );
+    loadData();
   }
+
+  loadData() async {
+    final dio = Dio();
+    final result = await dio.get("http://10.11.50.229:1150/products");
+    products = productFromJson(jsonEncode(result.data));
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-
-     List<String> dummyArray = ["Angular", "Flutter", "Arduion", "VueJS"];
-    
     return Scaffold(
-      appBar: AppBar(
-        title: Text("HomePage"),
-      ),
-      drawer: CustomDrawer(),
-      body: Column(
-        children: [
-          ...dummyArray.map((e) => Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(e),
-          ))
-        ],
-      ),
-    );
+        appBar: AppBar(
+          title: Text("HomePage"),
+        ),
+        drawer: CustomDrawer(),
+        body: ListView.builder(
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(" - " + products[index].name, style: TextStyle(fontSize: 10),),
+            );
+          },
+        ));
   }
 }
 
@@ -88,14 +93,20 @@ class CustomDrawer extends StatelessWidget {
       child: Column(
         children: [
           _buildProfile(),
-          ListTile(onTap: (){},
-          leading: Icon(Icons.add_box_rounded,color: Colors.deepPurple,),
-          trailing: Text("120"),
-          title: Text("Stock"),),
+          ListTile(
+            onTap: () {},
+            leading: Icon(
+              Icons.add_box_rounded,
+              color: Colors.deepPurple,
+            ),
+            trailing: Text("120"),
+            title: Text("Stock"),
+          ),
           ListTile(
             onTap: () => _showDialogBarcode(context),
             title: const Text("BarCode"),
-            leading: const Icon(Icons.bar_chart_outlined, color: Colors.deepOrange),
+            leading:
+                const Icon(Icons.bar_chart_outlined, color: Colors.deepOrange),
           ),
           ListTile(
             onTap: () => _showDialogQRImage(context),
@@ -140,7 +151,10 @@ class CustomDrawer extends StatelessWidget {
 
   Builder _buildLogoutButton() => Builder(
         builder: (context) => SafeArea(
-          child: ListTile(leading: const Icon(Icons.exit_to_app), title: const Text('Log out'), onTap: () => context.read<AuthBloc>().add(AuthEventLogout())),
+          child: ListTile(
+              leading: const Icon(Icons.exit_to_app),
+              title: const Text('Log out'),
+              onTap: () => context.read<AuthBloc>().add(AuthEventLogout())),
         ),
       );
 }
