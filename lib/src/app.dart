@@ -1,5 +1,6 @@
 import 'package:demo1/src/bloc/auth/auth_bloc.dart';
 import 'package:demo1/src/bloc/counter/counter_bloc.dart';
+import 'package:demo1/src/bloc/home/home_bloc.dart';
 import 'package:demo1/src/pages/app_routes.dart';
 import 'package:demo1/src/pages/home/home_page.dart';
 import 'package:demo1/src/pages/login/login_page.dart';
@@ -20,9 +21,10 @@ class App extends StatelessWidget {
     final counterBloc =
         BlocProvider<CounterBloc>(create: (context) => CounterBloc());
     final authBloc = BlocProvider<AuthBloc>(create: (context) => AuthBloc());
+    final homeBloc = BlocProvider<HomeBloc>(create: (context) => HomeBloc());
 
     return MultiBlocProvider(
-      providers: [counterBloc, authBloc],
+      providers: [counterBloc, authBloc, homeBloc],
       child: MaterialApp(
         title: "CodeMobiles App",
         routes: AppRoute.all,

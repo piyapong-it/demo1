@@ -28,10 +28,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   loadData() async {
-    final dio = Dio();
-    final result = await dio.get("http://10.11.50.229:1150/products");
-    products = productFromJson(jsonEncode(result.data));
-    setState(() {});
+    // final result = await dio.get("http://10.11.50.229:1150/products");
+    // products = productFromJson(jsonEncode(result.data));
+    // setState(() {});
   }
 
   @override
