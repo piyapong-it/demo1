@@ -13,3 +13,6 @@ class AuthEventLogin extends AuthEvent {
   final User payload;
   AuthEventLogin(this.payload);
 }
+
+// Logout Event
+class AuthEventLogout extends AuthEvent {}

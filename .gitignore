@@ -42,3 +42,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+/webapi_product/node_modules
+/webapi_map/node_modules

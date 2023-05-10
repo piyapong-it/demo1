@@ -7,6 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'constants/network_api.dart';
+import 'pages/loading/loading_page.dart';
+
+final navigatorState = GlobalKey<NavigatorState>();
+
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
 
@@ -22,12 +27,24 @@ class App extends StatelessWidget {
         title: "CodeMobiles App",
         routes: AppRoute.all,
         home: _buildInitialPage(),
+        navigatorKey: navigatorState,
       ),
     );
   }
 
-  _buildInitialPage() async {
-    final prefs = await SharedPreferences.getInstance();
-    return LoginPage();
+  _buildInitialPage() {
+    return FutureBuilder(
+      future: SharedPreferences.getInstance(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return LoadingPage();
+        }
+
+        // Check if previous state passed authentication?
+        final prefs = snapshot.data!;
+        final token = prefs.getString(NetworkAPI.token);
+        return token == null ? LoginPage() : HomePage();
+      },
+    );
   }
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../bloc/counter/counter_bloc.dart';
-import '../../../bloc/models/user.dart';
+import '../../../models/user.dart';
 import '../../app_routes.dart';
 
 class LoginForm extends StatelessWidget {
@@ -22,7 +22,7 @@ class LoginForm extends StatelessWidget {
       listener: (context, state) {
         switch (state.status) {
           case LoginStatus.success:
-            Navigator.pushNamed(context, AppRoute.home);
+            Navigator.pushReplacementNamed(context, AppRoute.home);
             break;
           case LoginStatus.failed:
             _showAlert(state.dialogMessage, context);
