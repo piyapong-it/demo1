@@ -41,6 +41,10 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         drawer: const CustomDrawer(),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => _navigateManagementPage(),
+          child: const Icon(Icons.add),
+        ),
         body: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
             final products = state.products;

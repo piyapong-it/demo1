@@ -29,6 +29,7 @@ class _ManagementPageState extends State<ManagementPage> {
     }
 
     return Scaffold(
+    
       appBar: AppBar(title: Text("Management"), actions: [
         IconButton(
             icon: Icon(Icons.upload),
