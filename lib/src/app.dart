@@ -7,11 +7,13 @@ import 'package:demo1/src/pages/login/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:intl/intl.dart';
 import 'constants/network_api.dart';
 import 'pages/loading/loading_page.dart';
 
 final navigatorState = GlobalKey<NavigatorState>();
+final formatCurrency = NumberFormat('#,###.000');
+final formatNumber = NumberFormat('#,###');
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);

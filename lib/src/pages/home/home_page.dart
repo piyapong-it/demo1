@@ -12,6 +12,7 @@ import 'package:dio/dio.dart';
 
 import '../../bloc/home/home_bloc.dart';
 import '../../constants/asset.dart';
+import 'widgets/product_item.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,30 +33,59 @@ class _HomePageState extends State<HomePage> {
     context.read<HomeBloc>().add(HomeEventFetch());
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("HomePage"),
-        ),
+        appBar: AppBar(title: const Text('Home')),
         drawer: CustomDrawer(),
         body: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
-            final Products = state.products;
-            return ListView.builder(
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text(
-                    " - " + products[index].name,
-                    style: TextStyle(fontSize: 10),
-                  ),
-                );
-              },
+            final products = state.products;
+            return Container(
+              child: state.isGrid ? _buildListView(products) : _buildListView(products),
             );
           },
         ));
+  }
+
+  Widget _buildListView(List<Product> products) {
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return Column(
+            children: [
+               _buildHeader(),
+              Padding(
+                padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
+                child: SizedBox(
+                  height: 350,
+                  child: ProductItem(
+                    product: products[index],
+                    onTap: () => {},
+                  ),
+                ),
+              ),
+            ],
+          );
+        } else {
+          return Padding(
+            padding: const EdgeInsets.only(left: 8, right: 8),
+            child: SizedBox(
+              height: 350,
+              child: ProductItem(
+                product: products[index],
+                onTap: () => {},
+              ),
+            ),
+          );
+        }
+      },
+      itemCount: products.length,
+    );
+  }
+  
+  _buildHeader() {
+    return Image.asset(Asset.logoImage);
   }
 }
 
