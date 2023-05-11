@@ -9,7 +9,7 @@ import '../../models/product.dart';
 
 class ManagementPage extends StatefulWidget {
   const ManagementPage({Key? key}) : super(key: key);
-
+  final String temp1 = "Golf";
   @override
   _ManagementPageState createState() => _ManagementPageState();
 }
@@ -22,6 +22,7 @@ class _ManagementPageState extends State<ManagementPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.temp1);
     final Object? arguments = ModalRoute.of(context)?.settings.arguments;
     if (arguments != null && arguments is Product) {
       _product = arguments;
