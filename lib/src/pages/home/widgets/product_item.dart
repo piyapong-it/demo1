@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../../app.dart';
@@ -94,7 +96,8 @@ class ProductItem extends StatelessWidget {
                     child: Text(
                       '฿${formatCurrency.format(product.price)}',
                       style: TextStyle(
-                        fontSize: isGrid ?? false ? 12 : 14,
+                        fontSize:
+                            isGrid ?? false ? getSubtitleFontSizeGrid() : 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -102,7 +105,8 @@ class ProductItem extends StatelessWidget {
                   Text(
                     '${formatNumber.format(product.stock)} pieces',
                     style: TextStyle(
-                      fontSize: isGrid ?? false ? 12 : 14,
+                      fontSize:
+                          isGrid ?? false ? getSubtitleFontSizeGrid() : 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.deepOrangeAccent,
                     ),
@@ -113,6 +117,10 @@ class ProductItem extends StatelessWidget {
           ),
         ),
       );
+
+  double getSubtitleFontSizeGrid() {
+    return Platform.isAndroid ? 12 : 10;
+  }
 
   Image _image(String image) {
     String imageUrl;
