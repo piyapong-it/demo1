@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:demo1/src/bloc/map/map_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as maptoolkit;
@@ -50,6 +53,7 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: _buildTrackingButton(),
         appBar: AppBar(title: Text('Map'), actions: [
           IconButton(
               onPressed: () {
@@ -71,6 +75,12 @@ class _MapPageState extends State<MapPage> {
                   markers: _markers,
                   polygons: _polygons,
                   initialCameraPosition: _initMap,
+                  onLongPress: (position) {
+                    _buildSingleMarker(position: position);
+                    context
+                        .read<MapBloc>()
+                        .add(MapEventSubmitLocation(position: position));
+                  },
                   onMapCreated: (controller) {
                     _controller.complete(controller);
                     _animateToPolygon();
@@ -79,6 +89,98 @@ class _MapPageState extends State<MapPage> {
             )
           ],
         ));
+  }
+
+  bool _stopTracking() {
+    if (_locationSubscription != null) {
+      _locationSubscription?.cancel();
+      _locationSubscription = null;
+      logger.d("Stop tracking...");
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> _animateCamera(LatLng latLng) async {
+    _controller.future.then((controller) {
+      controller.animateCamera(CameraUpdate.newLatLngZoom(latLng, 16));
+    });
+  }
+
+  void _trackingLocation() async {
+    // Start / Stop tracking
+    if (_stopTracking()) {
+      _markers.clear();
+      setState(() {});
+      return;
+    }
+
+    try {
+      // Check avaliablity and permission service
+      final serviceEnabled = await checkServiceGPS(_locationService);
+      if (!serviceEnabled) {
+        throw PlatformException(code: 'SERVICE_STATUS_DENIED');
+      }
+
+      final permissionGranted = await checkPermission(_locationService);
+      if (!permissionGranted) {
+        throw PlatformException(code: 'PERMISSION_DENIED');
+      }
+
+      // condition to tracking
+      await _locationService.changeSettings(
+        accuracy: LocationAccuracy.high,
+        interval: 10000,
+        distanceFilter: 15,
+      ); // meters.
+
+      _locationSubscription = _locationService.onLocationChanged.listen(
+        (locationData) async {
+          _markers.clear();
+          final latLng =
+              LatLng(locationData.latitude!, locationData.longitude!);
+          await _buildSingleMarker(position: latLng);
+          _animateCamera(latLng);
+          setState(() {});
+
+          // Send new location to server
+          context.read<MapBloc>().add(MapEventSubmitLocation(position: latLng));
+        },
+      );
+    } on PlatformException catch (e) {
+      switch (e.code) {
+        case 'PERMISSION_DENIED':
+          //todo
+          break;
+        case 'SERVICE_STATUS_ERROR':
+          //todo
+          break;
+        case 'SERVICE_STATUS_DENIED':
+          //todo
+          break;
+        default:
+        //todo
+      }
+    }
+  }
+
+  Widget _buildTrackingButton() {
+    final isTracking = _locationSubscription != null;
+    return Padding(
+      padding: const EdgeInsets.only(right: 50.0),
+      child: FloatingActionButton.extended(
+        onPressed: _trackingLocation,
+        label: BlocBuilder<MapBloc, MapState>(
+          builder: (context, state) {
+            return Text(isTracking
+                ? 'Stop Tracking ${formatPosition(state.currentPosition)}'
+                : 'Start Tracking');
+          },
+        ),
+        backgroundColor: isTracking ? Colors.red : Colors.blue,
+        icon: Icon(isTracking ? Icons.stop : Icons.play_arrow),
+      ),
+    );
   }
 
   Future<void> _animateToPolygon() async {
@@ -90,7 +192,8 @@ class _MapPageState extends State<MapPage> {
     // _dummyLatLng.forEach((latLng) => _buildSingleMarker(position: latLng));
 
     final bound = _boundsFromLatLngList(_dummyLatLng);
-    _controller.future.then((map) => map.moveCamera(CameraUpdate.newLatLngBounds(bound, 50)));
+    _controller.future
+        .then((map) => map.moveCamera(CameraUpdate.newLatLngBounds(bound, 50)));
   }
 
   LatLngBounds _boundsFromLatLngList(List<LatLng> list) {
@@ -123,9 +226,11 @@ class _MapPageState extends State<MapPage> {
 
         // https://www.mapdevelopers.com/area_finder.php
         // https://www.inchcalculator.com/convert/square-meter-to-square-kilometer/
-        final meterArea = maptoolkit.SphericalUtil.computeArea(mapToolkitLatLng);
+        final meterArea =
+            maptoolkit.SphericalUtil.computeArea(mapToolkitLatLng);
         final kmArea = formatCurrency.format(meterArea / (1000000));
-        CustomFlushbar.showSuccess(navigatorState.currentContext!, message: "Area: $kmArea ²Km");
+        CustomFlushbar.showSuccess(navigatorState.currentContext!,
+            message: "Area: $kmArea ²Km");
       },
       points: _dummyLatLng,
       strokeWidth: 2,
@@ -168,14 +273,16 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _buildSingleMarker({required LatLng position}) async {
-    final Uint8List markerIcon = await getBytesFromAsset(Asset.pinBikerImage, width: 150);
+    final Uint8List markerIcon =
+        await getBytesFromAsset(Asset.pinBikerImage, width: 150);
     final BitmapDescriptor bitmap = BitmapDescriptor.fromBytes(markerIcon);
     final marker = Marker(
       markerId: MarkerId(jsonEncode(position)),
       infoWindow: InfoWindow(
         title: formatPosition(position),
         snippet: "",
-        onTap: () => _launchMaps(lat: position.latitude, lng: position.longitude),
+        onTap: () =>
+            _launchMaps(lat: position.latitude, lng: position.longitude),
       ),
       icon: bitmap,
       position: position,
