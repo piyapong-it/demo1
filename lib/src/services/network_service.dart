@@ -100,7 +100,7 @@ class NetworkService {
     };
 
     Response response = await Dio().post(
-      "http://10.11.50.229:1151/submit_location",
+      "http://192.168.1.46:1151/submit_location",
       options: Options(headers: {HttpHeaders.contentTypeHeader: "application/json"}),
       data: jsonEncode(params),
     );
