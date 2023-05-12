@@ -3,6 +3,7 @@ import 'package:demo1/src/bloc/counter/counter_bloc.dart';
 import 'package:demo1/src/bloc/home/home_bloc.dart';
 import 'package:demo1/src/bloc/management/management_bloc.dart';
 import 'package:demo1/src/bloc/map/map_bloc.dart';
+import 'package:demo1/src/bloc/sqlite/sqlite_bloc.dart';
 import 'package:demo1/src/pages/app_routes.dart';
 import 'package:demo1/src/pages/home/home_page.dart';
 import 'package:demo1/src/pages/login/login_page.dart';
@@ -37,9 +38,10 @@ class App extends StatelessWidget {
     final homeBloc = BlocProvider<HomeBloc>(create: (context) => HomeBloc());
     final managementBloc = BlocProvider<ManagementBloc>(create: (context) => ManagementBloc());
     final mapBloc = BlocProvider<MapBloc>(create: (context) => MapBloc());
+    final sqliteBloc = BlocProvider<SqliteBloc>(create: (context) => SqliteBloc());
 
     return MultiBlocProvider(
-      providers: [counterBloc, authBloc, homeBloc, managementBloc, mapBloc],
+      providers: [counterBloc, authBloc, homeBloc, managementBloc, mapBloc, sqliteBloc],
       child: MaterialApp(
         title: "CodeMobiles App",
         routes: AppRoute.all,
