@@ -7,6 +7,7 @@ import 'package:demo1/src/bloc/sqlite/sqlite_bloc.dart';
 import 'package:demo1/src/pages/app_routes.dart';
 import 'package:demo1/src/pages/home/home_page.dart';
 import 'package:demo1/src/pages/login/login_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,16 +33,27 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+// kReleaseMode เป็นการเช็คว่ามีการ build ขึ้น production ไหม ถ้าขึ้น nothing คือไม่แสดง Logger
+    Logger.level = kReleaseMode ? Level.nothing : Level.debug;
     final counterBloc =
         BlocProvider<CounterBloc>(create: (context) => CounterBloc());
     final authBloc = BlocProvider<AuthBloc>(create: (context) => AuthBloc());
     final homeBloc = BlocProvider<HomeBloc>(create: (context) => HomeBloc());
-    final managementBloc = BlocProvider<ManagementBloc>(create: (context) => ManagementBloc());
+    final managementBloc =
+        BlocProvider<ManagementBloc>(create: (context) => ManagementBloc());
     final mapBloc = BlocProvider<MapBloc>(create: (context) => MapBloc());
-    final sqliteBloc = BlocProvider<SqliteBloc>(create: (context) => SqliteBloc());
+    final sqliteBloc =
+        BlocProvider<SqliteBloc>(create: (context) => SqliteBloc());
 
     return MultiBlocProvider(
-      providers: [counterBloc, authBloc, homeBloc, managementBloc, mapBloc, sqliteBloc],
+      providers: [
+        counterBloc,
+        authBloc,
+        homeBloc,
+        managementBloc,
+        mapBloc,
+        sqliteBloc
+      ],
       child: MaterialApp(
         title: "CodeMobiles App",
         routes: AppRoute.all,
